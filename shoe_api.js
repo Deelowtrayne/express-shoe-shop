@@ -5,10 +5,10 @@ const fs = require('fs');
 module.exports = function() {
 
     const pool = db_conx();
-    
+
     async function reset_db() {
         try {
-            let sql = fs.readFileSync('shoe_api.sql').toString();
+            let sql = fs.readFileSync('./config/database_setup.sql').toString();
             await pool.query(sql);
             console.log(
                 chalk.bgGreen.white('DB RESET SUCCESSFUL')
