@@ -37,7 +37,6 @@ app.get('/api/shoes/all', async (req, res, next) => {
     });
 });
 
-app.get()
 
 app.listen(PORT, () => {
     console.log('App running on port', PORT)
