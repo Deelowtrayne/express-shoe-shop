@@ -14,9 +14,30 @@ app.use(bodyParser.json());
 app.use(cors());
 
 
-app.get('/', (req, res) => {
-    res.send('shap joe!')
-})
+
+app.post('/api/shoes/add', async (req, res, next) => {
+    let shoe = req.body;
+
+    res.json({
+        status: await shoeApi.addShoe(shoe)
+    });
+});
+
+app.post('/api/shoes/update/:id', async (req, res, next) => {
+    let shoe = req.body;
+    shoe.shoe_id = req.params.id;
+    res.json({
+        status: await shoeApi.addShoe(shoe)
+    });
+});
+
+app.get('/api/shoes/all', async (req, res, next) => {
+    res.json({
+        data: await shoeApi.getShoes()
+    });
+});
+
+app.get()
 
 app.listen(PORT, () => {
     console.log('App running on port', PORT)

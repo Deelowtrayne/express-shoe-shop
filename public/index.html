@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Shoe-catalogue | A Javascript application for a simple shoe ordering system</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Axios -->
+    <script src="js/axios.js"></script>
+    <!-- Handlebars -->
+    <script src="js/handlebars.js"></script>
+    <!-- lodash -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.10/lodash.min.js"></script>
+    <!-- icon font -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="topbar clearfix">
+            <h1>Shoe Catalogue App<br><small>A simple javascript shoe catalogue application</small></h1>
+            <button class="cart-btn" onclick="toggleCart()"><i class="fas fa-shopping-cart"></i></button>
+            
+        </div>
+
+        <div class="add-shoe">
+            <select name="brand" class="shoe-brand">
+                <option value="">Shoe brand</option>
+                <option value="Nike">Nike</option>
+                <option value="Adidas">Adidas</option>
+                <option value="Puma">Puma</option>
+                <option value="Reebok">Reebok</option>
+            </select>
+            <select name="brand" class="shoe-colour">
+                <option value="">Shoe colour</option>
+                <option value="Black">Black</option>
+                <option value="White">White</option>
+                <option value="Brown">Brown</option>
+                <option value="Blue">Blue</option>
+            </select>
+            <select name="size" class="shoe-size">
+                <option value="">Shoe size</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+            <input type="number" class="shoe-price" placeholder="Shoe price">
+            <input type="number" class="shoe-qty" placeholder="In stock">
+            <button type="submit" class="add-button">Add</button>
+        </div>
+
+        <div class="cart-container">
+            <button class="cart-close" onclick="toggleCart()">&times;</button>
+            <div class="cart-wrapper clearfix">
+                <script type="text/x-template" class="cart-template">
+                    {{#each cartItems}}
+                    <div class="shoe clearfix">
+                        <table>
+                            <tr><td><b>Brand:</b></td> <td>{{brand}}</td></tr>
+                            <tr><td><b>Colour:</b></td> <td>{{colour}}</td></tr>
+                            <tr><td><b>Size:</b></td> <td>{{size}}</td></tr>
+                            <tr><td><b>Price:</b></td> <td>{{price}}</td></tr>
+                            <tr><td><b>Qty:</b></td> <td>{{qty}}</td></tr>
+                        </table>
+                        <!-- // Buy button -->
+                        <aside class="item-image"></aside>
+                    </div>
+                    {{/each}}
+                    <div class="cart-total">
+                        <button class="clear-cart" onclick="clearCart()"><i class="fas fa-trash"></i> clear all</button>
+                        Total Due: R{{total}}
+                    </div> 
+                </script>
+            </div>
+        </div>
+        
+        <div class="main clearfix">
+            
+            <section class="display-area">
+                <div class="alert">
+                    <span class="closebtn" onclick="toggleAlert()">&times;</span> 
+                    New shoe added successfully!
+                </div>
+                <div><button class="open-add-section" onclick="toggleAddNew()"><i class="fas fa-plus-circle"></i> Add new item</button></div>
+                <h2>Choose a brand</h2>
+                Filter By:<br><br>
+                <select name="brand" class="brand-select">
+                    <option value="">Choose brand</option>
+                    <option value="Nike">Nike</option>
+                    <option value="Adidas">Adidas</option>
+                    <option value="Puma">Puma</option>
+                    <option value="Reebok">Reebok</option>
+                </select>
+                <select name="brand" class="colour-select">
+                    <option value="">Choose colour</option>
+                    <option value="Black">Black</option>
+                    <option value="White">White</option>
+                    <option value="Brown">Brown</option>
+                    <option value="Blue">Blue</option>
+                </select>
+                <select name="size" class="size-select">
+                    <option value="">Choose size</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                </select>
+            </section>
+            <section class="display-area list-display">
+                
+                <script type="text/x-template" class="shoes-template">
+                    {{#each shoeList}}
+                    <div class="shoe clearfix">
+                        <table>
+                            <tr><td><b>Brand:</b></td> <td>{{brand}}</td></tr>
+                            <tr><td><b>Colour:</b></td> <td>{{colour}}</td></tr>
+                            <tr><td><b>Size:</b></td> <td>{{size}}</td></tr>
+                            <tr><td><b>Price:</b></td> <td>{{price}}</td></tr>
+                            <tr><td><b>Qty:</b></td> <td>{{qty}}</td></tr>
+                        </table>
+                        <button class="buy-btn" id="{{id}}" onclick="searchString(this)"><i class="fas fa-shopping-bag"></i></button>
+                        <!-- // Buy button -->
+                        {{!-- <aside class="item-image"></aside> --}}
+                    </div>
+                    {{/each}}
+                </script>
+            </section>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script src="js/shoe-catalogue.dom.js"></script>
+</body>
+</html>
+

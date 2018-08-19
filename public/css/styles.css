@@ -1,0 +1,239 @@
+@charset "UTF-8";
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+body {
+  font-family: 'Lato', Helvetica, sans-serif;
+}
+
+input, select {
+  padding: 6px;
+  margin-bottom: 6px;
+}
+
+.display-area select {
+  padding: 8px;
+  width: 80%;
+  margin-bottom: 1rem;
+}
+
+
+.clearfix::before, .clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.topbar {
+  padding: 1rem;
+}
+
+.topbar h1 {
+  line-height: 1.4rem;
+  float: left;
+}
+.topbar h1 small {
+  font-size: 50%;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.cart-btn {
+  font-size: 1.5rem;
+  float: right;
+  line-height: 4rem;
+  width: 4rem;
+  background: transparent;
+  border: none;
+  color: steelblue;
+}
+
+.cart-btn:hover {
+  color: orange;
+  cursor: pointer;
+}
+
+.main {
+  border: 1px #ccc solid;
+}
+
+.display-area {
+  float: left;
+  padding: 1.5rem;
+  height: 100%;
+  max-height: 400px;
+  width: 50%;
+  display: table-cell;
+  border-right: 2px #ccc solid;
+}
+
+.display-area:last-of-type {
+  border: none;
+  overflow-y: scroll;
+}
+
+.display-area h2 {
+  /* font-size: 1rem; */
+}
+.show {
+  display: block;
+}
+
+.display-area div {
+  text-align: center;
+}
+
+.open-add-section {
+  padding: 1rem;
+  background: none;
+  border: none;
+}
+.open-add-section:hover {
+  background: green;
+  color: #fff;
+  font-weight: bold;
+}
+
+.row:first-of-type select {
+  width: 40%;
+}
+
+.shoe {
+  position: relative;
+  font-weight: lighter;
+  font-size: small;
+  padding: 6px 1rem;
+  box-shadow: 0px 1px 4px #ccc;
+}
+.shoe table {
+  width: 80%;
+  float: left;
+  text-align: left;
+}
+.shoe tr td{
+  padding-right: 1rem;
+}
+
+.item-image {
+  background: url('../img/all-star.jpg') center center;
+  background-size: cover;
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  right: 1rem; bottom: 6px;
+}
+
+.buy-btn {
+  font-size: 120%;
+  color: #ccc;
+  padding: 0.6rem;
+  background: #fff;
+  border: none;
+}
+
+.buy-btn:hover {
+  color: #fff;
+  background: green;
+}
+
+.add-shoe{
+  /* z-index: 1000; */
+  padding: 1rem;
+  display: none;
+  background: #ccc;
+  transition: height 5s;
+}
+
+.add-shoe button {
+  padding: 6px;
+  min-width: 4rem;
+}
+
+.cart-container {
+  z-index: 10000;
+  position: absolute;
+  top: 4rem;
+  right: 2rem;
+  margin: auto;
+  background: #fff;
+  width: 50%;
+  max-width: 340px;
+  height: 400px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  display: none;
+}
+.cart-wrapper {
+  overflow-y: scroll;
+}
+
+.clear-cart {
+  display: block;
+  margin-bottom: 1rem;
+  background: transparent;
+  border: none;
+  color: #ccc;
+}
+.clear-cart:hover {
+  
+  color: crimson;
+}
+.cart-total {
+  position: absolute;
+  z-index: 10000;
+  font-size: 120%;
+  bottom: 0;
+  padding: 1rem;
+  background:#fff;
+  width: 100%;
+}
+.cart-close {
+  position: absolute;
+  right: 0;
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+  background: crimson;
+  border: none;
+  z-index: 100000;
+}
+
+/* The alert message box */
+.alert {
+  padding: 20px;
+  background-color: green;
+  color: white;
+  margin-bottom: 15px;
+  display: none;
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
+
+.show {
+  display: block;
+}
