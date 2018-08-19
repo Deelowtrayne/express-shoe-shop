@@ -8,7 +8,7 @@ module.exports = function () {
 
     async function reset_db() {
         try {
-            let sql = fs.readFileSync('./config/shoe_api.sql').toString();
+            let sql = fs.readFileSync('./shoe_api.sql').toString();
             await pool.query(sql);
             console.log(
                 chalk.bgGreen.white('DB RESET SUCCESSFUL')
