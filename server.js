@@ -1,8 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const ShoeApi = require('./shoe_api');
 
 const app = express();
+const shoeApi = ShoeApi();
 const PORT = process.env.PORT || 3000;
 
 // middleware
@@ -10,6 +12,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+
 
 app.get('/', (req, res) => {
     res.send('shap joe!')
