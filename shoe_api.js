@@ -27,7 +27,6 @@ module.exports = function () {
     // }
 
     async function addShoe(shoe) {
-
         if (!shoe) {
             console.log(chalk.bgRed.white('no shoe provided'));
             return 'no shoe provided';
@@ -35,11 +34,11 @@ module.exports = function () {
 
         try {
             var found = await findShoeById(shoe);
-
-            if (found.length > 0) {
+            if (found) {
                 console.log(chalk.bgRed.white('shoe already exists'));
                 return 'shoe already exists';
             }
+
             await pool.query('insert into shoes (brand, colour, size, price, qty) \
                 values ($1, $2, $3, $4, $5)',
                 [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty]
@@ -53,29 +52,30 @@ module.exports = function () {
     }
 
     async function updateShoe(shoe) {
-
-        let found = await findShoeById(shoe);
-
-        if (found.length < 1) {
-            return 'unknown shoe';
+        var found = await findShoeById(shoe);
+        if (!found) {
+            return {
+                status: 'error',
+                message: 'unknown shoe'
+            };
         }
+
         try {
-
-            for (let [field, value] of Object.entries(shoe)) {
-
-                pool.query('update shoes set ' + field + '=\'' + value + '\' where id=' + found[0].id)
-                    .then(res => {
-                        console.log(chalk.bgBlue.white('updated shoe', field))
-                    })
-                    .catch(err => {
-                        console.log(chalk.bgBlue.white('failed on field:', field))
-                    });
-            }
+            await pool.query('update shoes set brand=$1, colour=$2, \
+                size=$3, price=$4, qty=$5 where id=$6',
+                [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty, found.id]
+            )
             console.log(chalk.bgGreen.white('update successful'))
-            return 'update successful';
-
-        } catch (err) {
-            return 'update failed';
+            return {
+                status: 'success',
+                message: 'update successful'
+            }
+        }
+        catch (err) {
+            return {
+                status: 'error',
+                error: err.stack
+            }
         }
     }
 
@@ -85,40 +85,44 @@ module.exports = function () {
     }
 
     async function findShoeById(shoe) {
+        var results = {};
+        
         if (shoe.shoe_id) {
-            return pool.query('select * from shoes where id=$1', [shoe.shoe_id])
-                .then(result => result.rows);
+            results = await pool.query('select * from shoes where id=$1', [shoe.shoe_id]);
+            console.log(chalk.bgBlue.white(results));
+            return results.rows[0];
         }
-        let results = await pool.query('select * from shoes \
+
+        results = await pool.query('select * from shoes \
             where brand=$1 and colour=$2 and size=$3',
             [shoe.brand, shoe.colour, shoe.size]
         );
-        return results.rows;
+        return results.rows[0];
     }
 
     async function addToCart(shoe) {
         // find in shoes
         const found = await findShoeById(shoe);
-
+        console.log(chalk.bgBlue.white(found));
         // clean-up crew
-        if (found.length < 1) {
+        if (!found) {
             return 'unknown shoe';
         }
-        if (found[0].qty < 1) {
+        if (found.qty < 1) {
             return 'out of stock';
         }
-        if ((found[0].qty - shoe.qty) < 0) {
-            return `there are only ${found[0].qty} shoes left in stock`;
+        if ((found.qty - shoe.qty) < 0) {
+            return `there are only ${found.qty} shoes left in stock`;
         }
 
         try {
             // find in cart
             let cartMatch = await pool.query('select * from cart where shoe_id=$1',
-                [found[0].id]
+                [found.id]
             );
             // reformat price
-            let shoePrice = found[0].price.substring(1);
-            
+            let shoePrice = found.price.substring(1);
+
             if (cartMatch.rowCount < 1) {
                 // add to cart
                 await pool.query('insert into cart (shoe_id, qty, subtotal) \
@@ -138,11 +142,12 @@ module.exports = function () {
             );
             // update shoes - deduct the quantity
             await pool.query('update shoes set qty=qty-$1 where id=$2',
-                [shoe.qty, found[0].id]
+                [shoe.qty, found.id]
             );
             return 'cart updated';
 
         } catch (err) {
+            err.stack;
             return 'failed to add to cart';
         }
     }

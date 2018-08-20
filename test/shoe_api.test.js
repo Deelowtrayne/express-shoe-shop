@@ -1,3 +1,4 @@
+'use strict';
 const assert = require('assert');
 const ShoeApi = require('../shoe_api');
 
@@ -59,27 +60,9 @@ describe('tests the update shoe function', () => {
             qty: 15
         };
 
-        assert.equal(await shoeApi.updateShoe(shoe), 'update successful');
-    });
-    it('Should return (\'shoe updated successfully\')', async () => {
-        // add shoe first
-        await shoeApi.addShoe({
-            brand: 'Adidas',
-            colour: 'white',
-            size: 7,
-            price: 799.90,
-            qty: 12
-        });
-
-        let shoe = {
-            brand: 'Adidas',
-            colour: 'white',
-            size: 7,
-            price: 899.90,
-            qty: 15
-        };
-
-        assert.equal(await shoeApi.updateShoe(shoe), 'update successful');
+        assert.deepEqual(await shoeApi.updateShoe(shoe),
+            { status: 'success', message: 'update successful' }
+        );
     });
 
     it('Should return (\'unknown shoe\')', async () => {
@@ -91,7 +74,9 @@ describe('tests the update shoe function', () => {
             qty: 15
         };
 
-        assert.equal(await shoeApi.updateShoe(shoe), 'unknown shoe');
+        assert.deepEqual(await shoeApi.updateShoe(shoe),
+            { status: 'error', message: 'unknown shoe' }
+        );
     });
 
     after(async () => await shoeApi.end());
@@ -116,7 +101,7 @@ describe('tests the add to cart function', () => {
             shoe_id: 1,
             qty: 4
         };
-
+        
         assert.equal(await shoeApi.addToCart(shoe), 'added to cart');
     });
 
@@ -160,7 +145,7 @@ describe('tests the get shoes function', () => {
             qty: 12
         });
 
-        assert.deepEqual(await shoeApi.getShoes(), 
+        assert.deepEqual(await shoeApi.getShoes(),
             [{
                 id: 1,
                 brand: 'Adidas',

@@ -30,9 +30,7 @@ var displayElem = document.querySelector('.list-display');
 var cartWrapper = document.querySelector('.cart-wrapper');
 var addAlert = document.querySelector('.alert');
 
-// get stored data
-var storedShoes = localStorage.getItem('AVAILABLE_SHOES') ? JSON.parse(localStorage.getItem('AVAILABLE_SHOES')) : [];
-var storedCart = localStorage.getItem('CART') ? JSON.parse(localStorage.getItem('CART')) : [];
+
 // factory function instance
 var shoes = ShoeCatalogue(storedShoes, storedCart);
 
@@ -75,8 +73,6 @@ function updateCartDisplay() {
 
 function searchString(elem) {
     if (shoes.toCart(elem.id)) {
-        localStorage.setItem('AVAILABLE_SHOES', JSON.stringify(shoes.map()));
-        localStorage.setItem('CART', JSON.stringify(shoes.cart()));
         updateCartDisplay();
         // force reload to update
         location.reload();
@@ -87,8 +83,6 @@ function searchString(elem) {
 
 function clearCart() {
     shoes.cancel();
-    localStorage.setItem('AVAILABLE_SHOES', JSON.stringify(shoes.map()));
-    localStorage.removeItem('CART');
     // force reload to update
     location.reload();
 }
@@ -102,14 +96,13 @@ window.addEventListener('DOMContentLoaded', function(){
 })
 
 btnAddItem.addEventListener('click', function() {
-    shoes.new(
-        brandElem.value,
-        colourElem.value,
-        sizeElem.value,
-        priceElem.value,
-        qtyElem.value
-    );
-    localStorage.setItem('AVAILABLE_SHOES', JSON.stringify(shoes.map()));
+    shoes.new({
+        brand:  brandElem.value,
+        colour: colourElem.value,
+        size:   sizeElem.value,
+        price:  priceElem.value,
+        qty:    qtyElem.value
+    });
     toggleAlert();
     toggleAddNew();
 });
