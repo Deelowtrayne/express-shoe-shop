@@ -106,13 +106,22 @@ module.exports = function () {
         console.log(chalk.bgBlue.white(found));
         // clean-up crew
         if (!found) {
-            return 'unknown shoe';
+            return {
+                status: 'error',
+                message: 'unknown shoe'
+            };
         }
         if (found.qty < 1) {
-            return 'out of stock';
+            return {
+                status: 'error',
+                message: 'out of stock'
+            };
         }
         if ((found.qty - shoe.qty) < 0) {
-            return `there are only ${found.qty} shoes left in stock`;
+            return {
+                status: 'error',
+                message: `there are only ${found.qty} shoes left in stock`
+            };
         }
 
         try {
@@ -133,7 +142,10 @@ module.exports = function () {
                 await pool.query('update shoes set qty=qty-$1 where id=$2',
                     [shoe.qty, shoe.shoe_id]
                 );
-                return 'added to cart';
+                return {
+                    status: 'success',
+                    message: 'added to cart'
+                };
             }
 
             // update entry
@@ -144,11 +156,17 @@ module.exports = function () {
             await pool.query('update shoes set qty=qty-$1 where id=$2',
                 [shoe.qty, found.id]
             );
-            return 'cart updated';
+            return {
+                status: 'success',
+                message: 'cart updated'
+            };
 
         } catch (err) {
-            err.stack;
-            return 'failed to add to cart';
+            
+            return {
+                status: 'error',
+                error: err.stack
+            };
         }
     }
 

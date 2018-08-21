@@ -15,8 +15,7 @@ app.use(cors());
 
 // gets all sheos
 app.get('/api/shoes/all', async (req, res, next) => {
-    const { data, status, message } = await shoeApi.getShoes();
-    res.json({ data, status, message });
+    res.json(await shoeApi.getShoes());
 });
 
 // adds a shoe

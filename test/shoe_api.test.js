@@ -82,54 +82,6 @@ describe('tests the update shoe function', () => {
     after(async () => await shoeApi.end());
 });
 
-describe('tests the add to cart function', () => {
-    let shoeApi = ShoeApi();
-
-    beforeEach(async () => await shoeApi.reset_db());
-
-    it('Should return (\'shoe added to cart\')', async () => {
-        // add shoe first
-        await shoeApi.addShoe({
-            brand: 'Adidas',
-            colour: 'white',
-            size: 7,
-            price: 799.90,
-            qty: 12
-        });
-
-        let shoe = {
-            shoe_id: 1,
-            qty: 4
-        };
-        
-        assert.equal(await shoeApi.addToCart(shoe), 'added to cart');
-    });
-
-    it('Should return (\'cart updated\')', async () => {
-        // add shoe first
-        await shoeApi.addShoe({
-            brand: 'Adidas',
-            colour: 'white',
-            size: 7,
-            price: 799.90,
-            qty: 12
-        });
-
-        await shoeApi.addToCart({
-            shoe_id: 1,
-            qty: 2
-        });
-
-        let shoe = {
-            shoe_id: 1,
-            qty: 4
-        };
-        assert.equal(await shoeApi.addToCart(shoe), 'cart updated');
-    });
-
-    after(async () => await shoeApi.end());
-});
-
 describe('tests the get shoes function', () => {
     let shoeApi = ShoeApi();
 
@@ -157,3 +109,58 @@ describe('tests the get shoes function', () => {
         );
     });
 });
+
+describe('tests the add to cart function', () => {
+    let shoeApi = ShoeApi();
+
+    beforeEach(async () => await shoeApi.reset_db());
+
+    it('Should return (\'shoe added to cart\')', async () => {
+        // add shoe first
+        await shoeApi.addShoe({
+            brand: 'Adidas',
+            colour: 'white',
+            size: 7,
+            price: 799.90,
+            qty: 12
+        });
+
+        let shoe = {
+            shoe_id: 1,
+            qty: 4
+        };
+        
+        assert.deepEqual(await shoeApi.addToCart(shoe), {
+            status: 'success',
+            message: 'added to cart'
+        });
+    });
+
+    it('Should return (\'cart updated\')', async () => {
+        // add shoe first
+        await shoeApi.addShoe({
+            brand: 'Adidas',
+            colour: 'white',
+            size: 7,
+            price: 799.90,
+            qty: 12
+        });
+
+        await shoeApi.addToCart({
+            shoe_id: 1,
+            qty: 2
+        });
+
+        let shoe = {
+            shoe_id: 1,
+            qty: 4
+        };
+        assert.deepEqual(await shoeApi.addToCart(shoe), {
+            status: 'success',
+            message: 'cart updated'
+        });
+    });
+
+    after(async () => await shoeApi.end());
+});
+
