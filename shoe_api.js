@@ -81,13 +81,16 @@ module.exports = function () {
 
     async function getShoes() {
         try {
-            const result = await pool.query('select * from shoes');
+            const result = await pool.query('select * from shoes order by brand');
             return {
                 status: 'success',
-                data: result.rows
+                items: result.rows
             };
         } catch (err) {
-
+            return {
+                status: 'error',
+                error: err.stack
+            }
         }
     }
 
@@ -113,13 +116,22 @@ module.exports = function () {
         console.log(chalk.bgBlue.white(found));
         // clean-up crew
         if (!found) {
-            return 'unknown shoe';
+            return {
+                status: 'error',
+                message: 'unknown shoe'
+            };
         }
         if (found.qty < 1) {
-            return 'out of stock';
+            return {
+                status: 'error',
+                message: 'out of stock'
+            };
         }
         if ((found.qty - shoe.qty) < 0) {
-            return `there are only ${found.qty} shoes left in stock`;
+            return {
+                status: 'error',
+                message: `there are only ${found.qty} shoes left in stock`
+            };
         }
 
         try {
@@ -128,8 +140,7 @@ module.exports = function () {
                 [found.id]
             );
             // reformat price
-            let shoePrice = found.price.substring(1);
-
+            let shoePrice = found.price;
             if (cartMatch.rowCount < 1) {
                 // add to cart
                 await pool.query('insert into cart (shoe_id, qty, subtotal) \
@@ -140,10 +151,13 @@ module.exports = function () {
                 await pool.query('update shoes set qty=qty-$1 where id=$2',
                     [shoe.qty, shoe.shoe_id]
                 );
-                return 'added to cart';
+                return {
+                    status: 'success',
+                    message: 'added to cart'
+                };
             }
-
             // update entry
+
             await pool.query('update cart set qty=qty+$1, subtotal=subtotal+$2 where id=$3',
                 [shoe.qty, (shoePrice * shoe.qty), cartMatch.rows[0].id]
             );
@@ -165,8 +179,41 @@ module.exports = function () {
     }
 
     async function getCart() {
-        const result = await pool.query('select * from cart');
-        return result.rows;
+        let cart = {
+            total: 0,
+            items: []
+        };
+
+        const cartItems = await pool.query('select * from cart');
+        if (cartItems.rowCount > 0) {
+            // calculate the sum of cart items
+            cart.total = cartItems.rows.reduce((total, current) => {
+                return total + parseFloat(current.subtotal);
+            }, 0);
+            cart.total = (cart.total).toFixed(2);
+            // get shoe info
+            let items = await pool.query('select shoe_id, brand, size, cart.qty, subtotal \
+                from cart join shoes on cart.shoe_id=shoes.id'
+            );
+            cart.items = items.rows;
+        }
+        return cart;
+    }
+    async function clearCart() {
+        let found = await pool.query('select * from cart');
+
+        let qtyReplacePromises = found.rows.map(item => {
+            return pool.query('update shoes set qty=qty+$1 where id=$2',
+                [item.qty, item.shoe_id]
+            );
+        });
+        await Promise.all(qtyReplacePromises);
+        await pool.query('delete from cart');
+        
+        return {
+            status: 'success',
+            message: 'cart cleared'
+        }
     }
 
     async function end() {
@@ -180,6 +227,7 @@ module.exports = function () {
         getShoes,
         addToCart,
         getCart,
+        clearCart,
         end
     }
 }

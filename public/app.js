@@ -1,20 +1,28 @@
 function ShoeCatalogue() {
 
-
     function addNew(shoe) {
         return axios.post('/api/shoes/add', shoe);
     }
 
     function getAvailableShoes() {
-        return availableShoes;
+        return axios.get('/api/shoes/all');
     }
 
     function filterFunc(search_params) {
-        return _.filter(availableShoes, search_params);
+        console.log("search params", search_params);
+        return getAvailableShoes()
+            .then(res => {
+                console.log(res);
+                
+                return _.filter(res.data.items, search_params)
+            });
     }
 
-    function addtoCart(id) {
-        return axios.post('/api/cart/add/'+id);
+    function addtoCart(item) {
+        return axios.post(
+            '/api/cart/add/'+item.id,
+            { qty: item.qty }
+        );
     }
 
     function clearTrolley() {
@@ -22,14 +30,8 @@ function ShoeCatalogue() {
     }
 
     function getTrolley() {
-        return axios.get('/api/cart/all')
+        return axios.get('/api/cart/all');
     }
-
-    function getCartTotal() {
-        return axios.get('/api/cart/total')
-    }
-
-    
 
     return {
         new: addNew,
@@ -37,7 +39,7 @@ function ShoeCatalogue() {
         filterBy: filterFunc,
         toCart: addtoCart,
         cart: getTrolley,
-        cartTotal: getCartTotal,
+        //cartTotal: getCartTotal,
         cancel: clearTrolley
     };
 }

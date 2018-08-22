@@ -45,6 +45,11 @@ app.post('/api/cart/add/:id', async (req, res, next) => {
     res.json(await shoeApi.addToCart(shoe));
 });
 
+// clear the cart
+app.get('/api/cart/clear', async (req, res, next) => {
+    res.json(await shoeApi.clearCart());
+});
+
 // checkout a cart?
 
 app.listen(PORT, () => console.log('App running on port', PORT));

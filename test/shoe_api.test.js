@@ -75,11 +75,42 @@ describe('tests the update shoe function', () => {
         };
 
         assert.deepEqual(await shoeApi.updateShoe(shoe),
-            { status: 'error', message: 'unknown shoe' }
+            { status: 'error', error: 'unknown shoe' }
         );
     });
 
     after(async () => await shoeApi.end());
+});
+
+describe('tests the get shoes function', () => {
+    let shoeApi = ShoeApi();
+
+    beforeEach(async () => await shoeApi.reset_db());
+
+    it('Should return all stored shoes', async () => {
+        // add shoe first
+        await shoeApi.addShoe({
+            brand: 'Adidas',
+            colour: 'white',
+            size: 7,
+            price: 799.90,
+            qty: 12
+        });
+
+        assert.deepEqual(await shoeApi.getShoes(),
+            {
+                status: 'success',
+                items: [{
+                    id: 1,
+                    brand: 'Adidas',
+                    colour: 'white',
+                    size: 7,
+                    price: '799.90',
+                    qty: 12
+                }]
+            }
+        );
+    });
 });
 
 describe('tests the add to cart function', () => {
@@ -101,8 +132,8 @@ describe('tests the add to cart function', () => {
             shoe_id: 1,
             qty: 4
         };
-        
-        assert.equal(await shoeApi.addToCart(shoe), 
+
+        assert.deepEqual(await shoeApi.addToCart(shoe),
             { status: 'success', message: 'added to cart' }
         );
     });
@@ -126,7 +157,7 @@ describe('tests the add to cart function', () => {
             shoe_id: 1,
             qty: 4
         };
-        assert.equal(await shoeApi.addToCart(shoe),
+        assert.deepEqual(await shoeApi.addToCart(shoe),
             { status: 'success', message: 'cart updated' }
         );
     });
@@ -134,13 +165,17 @@ describe('tests the add to cart function', () => {
     after(async () => await shoeApi.end());
 });
 
-describe('tests the get shoes function', () => {
+describe('tests the get cart function', () => {
     let shoeApi = ShoeApi();
 
     beforeEach(async () => await shoeApi.reset_db());
 
-    it('Should return all stored shoes', async () => {
-        // add shoe first
+    it('Should return an empty array and 0 for total', async () => {
+        assert.deepEqual(await shoeApi.getCart(), { total: 0, items: [] });
+    });
+
+    it('Should return cart items', async () => {
+        // add shoe 1
         await shoeApi.addShoe({
             brand: 'Adidas',
             colour: 'white',
@@ -148,16 +183,47 @@ describe('tests the get shoes function', () => {
             price: 799.90,
             qty: 12
         });
-
-        assert.deepEqual(await shoeApi.getShoes(),
-            [{
-                id: 1,
-                brand: 'Adidas',
-                colour: 'white',
-                size: 7,
-                price: 'R799.90',
-                qty: 12
-            }]
+        // add shoe 2
+        await shoeApi.addShoe({
+            brand: 'Nike',
+            colour: 'white',
+            size: 7,
+            price: 799.90,
+            qty: 12
+        });
+        // add to cart
+        await shoeApi.addToCart({
+            shoe_id: 1,
+            qty: 4
+        });
+        await shoeApi.addToCart({
+            shoe_id: 2,
+            qty: 4
+        });
+        // get cart
+        assert.deepEqual(await shoeApi.getCart(),
+            {
+                total: 6399.2,
+                items: [
+                    {
+                        shoe_id: 1,
+                        brand: 'Adidas',
+                        size: 7,
+                        qty: 4,
+                        subtotal: 3199.6
+                    },
+                    {
+                        brand: "Nike",
+                        qty: 4,
+                        shoe_id: 2,
+                        size: 7,
+                        subtotal: 3199.6
+                    }
+                ]
+            }
         );
     });
+
+    after(async () => await shoeApi.end());
 });
+
