@@ -4,7 +4,8 @@
   "description": "API setup for shoe-catalogue application",
   "main": "server.js",
   "scripts": {
-    "test": "nyc mocha"
+    "test": "nyc mocha",
+    "start": "node server.js"
   },
   "author": "Luvuyo Sono",
   "license": "ISC",
