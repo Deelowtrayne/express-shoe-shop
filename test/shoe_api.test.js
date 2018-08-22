@@ -102,7 +102,9 @@ describe('tests the add to cart function', () => {
             qty: 4
         };
         
-        assert.equal(await shoeApi.addToCart(shoe), 'added to cart');
+        assert.equal(await shoeApi.addToCart(shoe), 
+            { status: 'success', message: 'added to cart' }
+        );
     });
 
     it('Should return (\'cart updated\')', async () => {
@@ -124,7 +126,9 @@ describe('tests the add to cart function', () => {
             shoe_id: 1,
             qty: 4
         };
-        assert.equal(await shoeApi.addToCart(shoe), 'cart updated');
+        assert.equal(await shoeApi.addToCart(shoe),
+            { status: 'success', message: 'cart updated' }
+        );
     });
 
     after(async () => await shoeApi.end());

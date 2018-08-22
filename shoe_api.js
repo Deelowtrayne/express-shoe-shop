@@ -56,7 +56,7 @@ module.exports = function () {
         if (!found) {
             return {
                 status: 'error',
-                message: 'unknown shoe'
+                error: 'unknown shoe'
             };
         }
 
@@ -80,13 +80,20 @@ module.exports = function () {
     }
 
     async function getShoes() {
-        const result = await pool.query('select * from shoes');
-        return result.rows;
+        try {
+            const result = await pool.query('select * from shoes');
+            return {
+                status: 'success',
+                data: result.rows
+            };
+        } catch (err) {
+
+        }
     }
 
     async function findShoeById(shoe) {
         var results = {};
-        
+
         if (shoe.shoe_id) {
             results = await pool.query('select * from shoes where id=$1', [shoe.shoe_id]);
             console.log(chalk.bgBlue.white(results));
@@ -144,11 +151,16 @@ module.exports = function () {
             await pool.query('update shoes set qty=qty-$1 where id=$2',
                 [shoe.qty, found.id]
             );
-            return 'cart updated';
+            return {
+                status: 'success',
+                message: 'cart updated'
+            };
 
         } catch (err) {
-            err.stack;
-            return 'failed to add to cart';
+            return {
+                status: 'error',
+                error: err.stack
+            }
         }
     }
 

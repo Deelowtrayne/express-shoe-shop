@@ -25,9 +25,9 @@ function ShoeCatalogue() {
         return axios.get('/api/cart/all')
     }
 
-    // function getCartTotal() {
-    //     return axios.get('/api/cart/total')
-    // }
+    function getCartTotal() {
+        return axios.get('/api/cart/total')
+    }
 
     
 
