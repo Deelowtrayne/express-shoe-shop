@@ -1,16 +1,16 @@
 const db_conx = require('./config/dbconnection');
 const chalk = require('chalk');
 const fs = require('fs');
-
+const connection = process.env.PG_CONNECTION_STRING || {
+    host: '127.0.0.1',
+    user: 'deelowtrayne',
+    password: 'nomawonga',
+    database: 'shoe_api'
+}
 const knex = require('knex')({
     client: 'pg',
     version: '7.2',
-    connection: {
-        host: '127.0.0.1',
-        user: 'coder',
-        password: 'coder123',
-        database: 'shoe_api'
-    }
+    connection
 });
 
 module.exports = function () {
@@ -92,9 +92,11 @@ module.exports = function () {
 
     async function getShoes(params) {
         if (params) {
-            await knex.select('*').from('users').where({
-                params
-            })
+            let results = await knex.select('*').from('shoes').where(params).timeout(2000);
+            return {
+                status: 'success',
+                items: results
+            };
         }
 
         try {
@@ -116,7 +118,6 @@ module.exports = function () {
 
         if (shoe.shoe_id) {
             results = await pool.query('select * from shoes where id=$1', [shoe.shoe_id]);
-            console.log(chalk.bgBlue.white(results));
             return results.rows[0];
         }
 
@@ -130,7 +131,6 @@ module.exports = function () {
     async function addToCart(shoe) {
         // find in shoes
         const found = await findShoe(shoe);
-        console.log(chalk.bgBlue.white(found));
         // clean-up crew
         if (!found) {
             return {

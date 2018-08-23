@@ -227,3 +227,42 @@ describe('tests the get cart function', () => {
     after(async () => await shoeApi.end());
 });
 
+describe('tests the shoe filter functionality', async () => {
+    let shoeApi = ShoeApi();
+
+    beforeEach(async () => await shoeApi.reset_db());
+
+    it('Should return one matching shoe', async () => {
+        // add shoe 1
+        await shoeApi.addShoe({
+            brand: 'Adidas',
+            colour: 'white',
+            size: 7,
+            price: 799.90,
+            qty: 12
+        });
+        // add shoe 2
+        await shoeApi.addShoe({
+            brand: 'Nike',
+            colour: 'white',
+            size: 7,
+            price: 799.90,
+            qty: 12
+        });
+        assert.deepEqual(await shoeApi.getShoes({brand: 'Adidas'}),
+            {
+                status: 'success',
+                items: [{
+                    id: 1,
+                    brand: 'Adidas',
+                    colour: 'white',
+                    size: 7,
+                    price: 799.9,
+                    qty: 12
+                }]
+            }
+        );
+    });
+
+    after(async () => await shoeApi.end());
+});

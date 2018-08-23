@@ -47,9 +47,9 @@ function filterEvent() {
     if (sizeSelect.value !== '') {
         params.size = Number(sizeSelect.value);
     }
-    let filteredShoes = shoes.filterBy(params)
+    shoes.map(params)
         .then(res => {
-            displayElem.innerHTML = SHOE_TEMPLATE({ shoeList: res })
+            displayElem.innerHTML = SHOE_TEMPLATE({ shoeList: res.items })
         });
 }
 
@@ -119,9 +119,9 @@ btnAddItem.addEventListener('click', function () {
     let shoe = {
         brand: brandElem.value,
         colour: colourElem.value,
-        size: sizeElem.value,
-        price: priceElem.value,
-        qty: qtyElem.value
+        size: Number(sizeElem.value),
+        price: parseFloat(priceElem.value),
+        qty: Number(qtyElem.value)
     };
     shoes.new(shoe).then(res => {
         toggleAlert(res.data.message);
