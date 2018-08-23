@@ -39,9 +39,6 @@ function ShoeCatalogue() {
         filterBy: filterFunc,
         toCart: addtoCart,
         cart: getTrolley,
-        //cartTotal: getCartTotal,
         cancel: clearTrolley
     };
 }
-
-

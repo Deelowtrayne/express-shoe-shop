@@ -2,6 +2,17 @@ const db_conx = require('./config/dbconnection');
 const chalk = require('chalk');
 const fs = require('fs');
 
+const knex = require('knex')({
+    client: 'pg',
+    version: '7.2',
+    connection: {
+        host: '127.0.0.1',
+        user: 'coder',
+        password: 'coder123',
+        database: 'shoe_api'
+    }
+});
+
 module.exports = function () {
 
     const pool = db_conx();
@@ -32,13 +43,13 @@ module.exports = function () {
             return 'no shoe provided';
         }
 
-        try {
-            var found = await findShoeById(shoe);
-            if (found) {
-                console.log(chalk.bgRed.white('shoe already exists'));
-                return 'shoe already exists';
-            }
+        var found = await findShoe(shoe);
+        if (found) {
+            console.log(chalk.bgRed.white('shoe already exists'));
+            return 'shoe already exists';
+        }
 
+        try {
             await pool.query('insert into shoes (brand, colour, size, price, qty) \
                 values ($1, $2, $3, $4, $5)',
                 [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty]
@@ -52,7 +63,7 @@ module.exports = function () {
     }
 
     async function updateShoe(shoe) {
-        var found = await findShoeById(shoe);
+        var found = await findShoe(shoe);
         if (!found) {
             return {
                 status: 'error',
@@ -79,7 +90,13 @@ module.exports = function () {
         }
     }
 
-    async function getShoes() {
+    async function getShoes(params) {
+        if (params) {
+            await knex.select('*').from('users').where({
+                params
+            })
+        }
+
         try {
             const result = await pool.query('select * from shoes order by brand');
             return {
@@ -94,7 +111,7 @@ module.exports = function () {
         }
     }
 
-    async function findShoeById(shoe) {
+    async function findShoe(shoe) {
         var results = {};
 
         if (shoe.shoe_id) {
@@ -112,7 +129,7 @@ module.exports = function () {
 
     async function addToCart(shoe) {
         // find in shoes
-        const found = await findShoeById(shoe);
+        const found = await findShoe(shoe);
         console.log(chalk.bgBlue.white(found));
         // clean-up crew
         if (!found) {
@@ -157,7 +174,6 @@ module.exports = function () {
                 };
             }
             // update entry
-
             await pool.query('update cart set qty=qty+$1, subtotal=subtotal+$2 where id=$3',
                 [shoe.qty, (shoePrice * shoe.qty), cartMatch.rows[0].id]
             );
@@ -209,7 +225,7 @@ module.exports = function () {
         });
         await Promise.all(qtyReplacePromises);
         await pool.query('delete from cart');
-        
+
         return {
             status: 'success',
             message: 'cart cleared'
