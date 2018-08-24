@@ -1,14 +1,26 @@
 'use strict';
+// DEPENDANCY IMPORTS
 const assert = require('assert');
-const ShoeApi = require('../shoe_api');
+const chalk = require('chalk');
+const fs = require('fs');
+// MODULE IMPORTS
+const Connection = require('../config/dbconnection');
+const ShoeService = require('../services/ShoeService');
+const CartService = require('../services/CartService');
+// INSTANCES
+const pool = Connection();
+const shoes = ShoeService(pool);
+const cart = CartService(pool);
 
+/* ------------------------------------------------------------------------- 
+    TESTS START HERE...
+   ------------------------------------------------------------------------- */
 describe('tests the add shoe function', () => {
-    let shoeApi = ShoeApi();
-
-    beforeEach(async () => await shoeApi.reset_db());
+    
+    beforeEach(async () => await reset_db());
 
     it('Should return (\'no shoe provided\')', async () => {
-        assert.equal(await shoeApi.addShoe(), 'no shoe provided');
+        assert.equal(await shoes.addShoe(), 'no shoe provided');
     });
 
     it('Should return (\'shoe added successfully\')', async () => {
@@ -19,7 +31,7 @@ describe('tests the add shoe function', () => {
             price: 799.90,
             qty: 12
         }
-        assert.equal(await shoeApi.addShoe(shoe), 'shoe added successfully');
+        assert.equal(await shoes.addShoe(shoe), 'shoe added successfully');
     });
 
     it('Should return (\'shoe already exists\')', async () => {
@@ -30,21 +42,18 @@ describe('tests the add shoe function', () => {
             price: 799.90,
             qty: 12
         }
-        await shoeApi.addShoe(shoe);
-        assert.equal(await shoeApi.addShoe(shoe), 'shoe already exists');
+        await shoes.addShoe(shoe);
+        assert.equal(await shoes.addShoe(shoe), 'shoe already exists');
     });
-
-    after(async () => await shoeApi.end());
 });
 
 describe('tests the update shoe function', () => {
-    let shoeApi = ShoeApi();
-
-    beforeEach(async () => await shoeApi.reset_db());
+    
+    beforeEach(async () => await reset_db());
 
     it('Should return (\'shoe updated successfully\')', async () => {
         // add shoe first
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Adidas',
             colour: 'white',
             size: 7,
@@ -60,7 +69,7 @@ describe('tests the update shoe function', () => {
             qty: 15
         };
 
-        assert.deepEqual(await shoeApi.updateShoe(shoe),
+        assert.deepEqual(await shoes.updateShoe(shoe),
             { status: 'success', message: 'update successful' }
         );
     });
@@ -74,22 +83,19 @@ describe('tests the update shoe function', () => {
             qty: 15
         };
 
-        assert.deepEqual(await shoeApi.updateShoe(shoe),
+        assert.deepEqual(await shoes.updateShoe(shoe),
             { status: 'error', error: 'unknown shoe' }
         );
     });
-
-    after(async () => await shoeApi.end());
 });
 
 describe('tests the get shoes function', () => {
-    let shoeApi = ShoeApi();
 
-    beforeEach(async () => await shoeApi.reset_db());
+    beforeEach(async () => await reset_db());
 
     it('Should return all stored shoes', async () => {
         // add shoe first
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Adidas',
             colour: 'white',
             size: 7,
@@ -97,7 +103,7 @@ describe('tests the get shoes function', () => {
             qty: 12
         });
 
-        assert.deepEqual(await shoeApi.getShoes(),
+        assert.deepEqual(await shoes.getShoes(),
             {
                 status: 'success',
                 items: [{
@@ -114,13 +120,12 @@ describe('tests the get shoes function', () => {
 });
 
 describe('tests the add to cart function', () => {
-    let shoeApi = ShoeApi();
 
-    beforeEach(async () => await shoeApi.reset_db());
+    beforeEach(async () => await reset_db());
 
     it('Should return (\'shoe added to cart\')', async () => {
         // add shoe first
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Adidas',
             colour: 'white',
             size: 7,
@@ -133,14 +138,14 @@ describe('tests the add to cart function', () => {
             qty: 4
         };
 
-        assert.deepEqual(await shoeApi.addToCart(shoe),
+        assert.deepEqual(await cart.addToCart(shoe),
             { status: 'success', message: 'added to cart' }
         );
     });
 
     it('Should return (\'cart updated\')', async () => {
         // add shoe first
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Adidas',
             colour: 'white',
             size: 7,
@@ -148,7 +153,7 @@ describe('tests the add to cart function', () => {
             qty: 12
         });
 
-        await shoeApi.addToCart({
+        await cart.addToCart({
             shoe_id: 1,
             qty: 2
         });
@@ -157,26 +162,23 @@ describe('tests the add to cart function', () => {
             shoe_id: 1,
             qty: 4
         };
-        assert.deepEqual(await shoeApi.addToCart(shoe),
+        assert.deepEqual(await cart.addToCart(shoe),
             { status: 'success', message: 'cart updated' }
         );
     });
-
-    after(async () => await shoeApi.end());
 });
 
 describe('tests the get cart function', () => {
-    let shoeApi = ShoeApi();
 
-    beforeEach(async () => await shoeApi.reset_db());
+    beforeEach(async () => await reset_db());
 
     it('Should return an empty array and 0 for total', async () => {
-        assert.deepEqual(await shoeApi.getCart(), { total: 0, items: [] });
+        assert.deepEqual(await cart.getCart(), { total: 0, items: [] });
     });
 
     it('Should return cart items', async () => {
         // add shoe 1
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Adidas',
             colour: 'white',
             size: 7,
@@ -184,7 +186,7 @@ describe('tests the get cart function', () => {
             qty: 12
         });
         // add shoe 2
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Nike',
             colour: 'white',
             size: 7,
@@ -192,16 +194,16 @@ describe('tests the get cart function', () => {
             qty: 12
         });
         // add to cart
-        await shoeApi.addToCart({
+        await cart.addToCart({
             shoe_id: 1,
             qty: 4
         });
-        await shoeApi.addToCart({
+        await cart.addToCart({
             shoe_id: 2,
             qty: 4
         });
         // get cart
-        assert.deepEqual(await shoeApi.getCart(),
+        assert.deepEqual(await cart.getCart(),
             {
                 total: 6399.2,
                 items: [
@@ -223,18 +225,15 @@ describe('tests the get cart function', () => {
             }
         );
     });
-
-    after(async () => await shoeApi.end());
 });
 
 describe('tests the shoe filter functionality', async () => {
-    let shoeApi = ShoeApi();
 
-    beforeEach(async () => await shoeApi.reset_db());
+    beforeEach(async () => await reset_db());
 
     it('Should return one matching shoe', async () => {
         // add shoe 1
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Adidas',
             colour: 'white',
             size: 7,
@@ -242,14 +241,14 @@ describe('tests the shoe filter functionality', async () => {
             qty: 12
         });
         // add shoe 2
-        await shoeApi.addShoe({
+        await shoes.addShoe({
             brand: 'Nike',
             colour: 'white',
             size: 7,
             price: 799.90,
             qty: 12
         });
-        assert.deepEqual(await shoeApi.getShoes({brand: 'Adidas', colour: 'white'}),
+        assert.deepEqual(await shoes.getShoes({brand: 'Adidas', colour: 'white'}),
             {
                 status: 'success',
                 items: [{
@@ -263,6 +262,26 @@ describe('tests the shoe filter functionality', async () => {
             }
         );
     });
-
-    after(async () => await shoeApi.end());
+    // await endQuery();
 });
+
+//========================================================================
+
+// beforeEach handler
+async function reset_db() {
+    try {
+        let sql = fs.readFileSync('./shoe_api.sql').toString();
+        await pool.query(sql);
+        console.log(
+            chalk.bgGreen.white('DB RESET SUCCESSFUL')
+        );
+    } catch (err) {
+        console.log(
+            chalk.bgRed.white('RESET ERROR'), err);
+    }
+}
+
+// after handler
+async function endQuery() {
+    await pool.end();
+}
