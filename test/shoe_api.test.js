@@ -249,7 +249,7 @@ describe('tests the shoe filter functionality', async () => {
             price: 799.90,
             qty: 12
         });
-        assert.deepEqual(await shoeApi.getShoes({brand: 'Adidas'}),
+        assert.deepEqual(await shoeApi.getShoes({brand: 'Adidas', colour: 'white'}),
             {
                 status: 'success',
                 items: [{

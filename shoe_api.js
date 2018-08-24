@@ -3,8 +3,8 @@ const chalk = require('chalk');
 const fs = require('fs');
 const connection = process.env.PG_CONNECTION_STRING || {
     host: '127.0.0.1',
-    user: 'deelowtrayne',
-    password: 'nomawonga',
+    user: 'coder',
+    password: 'coder123',
     database: 'shoe_api'
 }
 const knex = require('knex')({

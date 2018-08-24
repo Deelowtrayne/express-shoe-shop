@@ -9,11 +9,8 @@ function ShoeCatalogue() {
     }
 
     function filterFunc(search_params) {
-        console.log("search params", search_params);
         return getAvailableShoes()
             .then(res => {
-                console.log(res);
-                
                 return _.filter(res.data.items, search_params)
             });
     }
