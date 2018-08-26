@@ -9,15 +9,11 @@ function ShoeCatalogue() {
     }
 
     function filterFunc(search_params) {
-        return getAvailableShoes()
-            .then(res => {
-                return _.filter(res.data.items, search_params)
-            });
+        return axios.post('/api/shoes/filter', search_params);
     }
 
     function addtoCart(item) {
-        return axios.post(
-            '/api/cart/add/'+item.id,
+        return axios.post('/api/cart/add/'+item.id,
             { qty: item.qty }
         );
     }

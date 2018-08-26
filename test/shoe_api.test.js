@@ -7,9 +7,18 @@ const fs = require('fs');
 const Connection = require('../config/dbconnection');
 const ShoeService = require('../services/ShoeService');
 const CartService = require('../services/CartService');
+const knex = require('knex')({
+    client: 'pg',
+    version: '7.2',
+    connection: process.env.DATABASE_URL || {
+        host: '127.0.0.1',
+        password: 'nomawonga',
+        database: 'shoe_api'
+    }
+});
 // INSTANCES
 const pool = Connection();
-const shoes = ShoeService(pool);
+const shoes = ShoeService(pool, knex);
 const cart = CartService(pool);
 
 /* ------------------------------------------------------------------------- 
@@ -20,30 +29,34 @@ describe('tests the add shoe function', () => {
     beforeEach(async () => await reset_db());
 
     it('Should return (\'no shoe provided\')', async () => {
-        assert.equal(await shoes.addShoe(), 'no shoe provided');
+        assert.deepEqual(await shoes.addShoe(), 
+            { status: 'error', message: 'no shoe provided' }
+        );
     });
 
     it('Should return (\'shoe added successfully\')', async () => {
         let shoe = {
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
         }
-        assert.equal(await shoes.addShoe(shoe), 'shoe added successfully');
+        assert.deepEqual(await shoes.addShoe(shoe), { status: 'success', message: 'shoe added successfully' });
     });
 
     it('Should return (\'shoe already exists\')', async () => {
         let shoe = {
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
         }
         await shoes.addShoe(shoe);
-        assert.equal(await shoes.addShoe(shoe), 'shoe already exists');
+        assert.deepEqual(await shoes.addShoe(shoe), 
+            { status: 'error', message: 'shoe already exists' }
+        );
     });
 });
 
@@ -55,7 +68,7 @@ describe('tests the update shoe function', () => {
         // add shoe first
         await shoes.addShoe({
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -63,7 +76,7 @@ describe('tests the update shoe function', () => {
 
         let shoe = {
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 899.90,
             qty: 15
@@ -77,7 +90,7 @@ describe('tests the update shoe function', () => {
     it('Should return (\'unknown shoe\')', async () => {
         let shoe = {
             brand: 'Nike',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 899.90,
             qty: 15
@@ -97,7 +110,7 @@ describe('tests the get shoes function', () => {
         // add shoe first
         await shoes.addShoe({
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -109,7 +122,7 @@ describe('tests the get shoes function', () => {
                 items: [{
                     id: 1,
                     brand: 'Adidas',
-                    colour: 'white',
+                    colour: 'White',
                     size: 7,
                     price: '799.90',
                     qty: 12
@@ -127,7 +140,7 @@ describe('tests the add to cart function', () => {
         // add shoe first
         await shoes.addShoe({
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -147,7 +160,7 @@ describe('tests the add to cart function', () => {
         // add shoe first
         await shoes.addShoe({
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -180,7 +193,7 @@ describe('tests the get cart function', () => {
         // add shoe 1
         await shoes.addShoe({
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -188,7 +201,7 @@ describe('tests the get cart function', () => {
         // add shoe 2
         await shoes.addShoe({
             brand: 'Nike',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -235,7 +248,7 @@ describe('tests the shoe filter functionality', async () => {
         // add shoe 1
         await shoes.addShoe({
             brand: 'Adidas',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
@@ -243,18 +256,18 @@ describe('tests the shoe filter functionality', async () => {
         // add shoe 2
         await shoes.addShoe({
             brand: 'Nike',
-            colour: 'white',
+            colour: 'White',
             size: 7,
             price: 799.90,
             qty: 12
         });
-        assert.deepEqual(await shoes.getShoes({brand: 'Adidas', colour: 'white'}),
+        assert.deepEqual(await shoes.getShoes({brand: 'Adidas', colour: 'White'}),
             {
                 status: 'success',
                 items: [{
                     id: 1,
                     brand: 'Adidas',
-                    colour: 'white',
+                    colour: 'White',
                     size: 7,
                     price: 799.9,
                     qty: 12
@@ -279,9 +292,4 @@ async function reset_db() {
         console.log(
             chalk.bgRed.white('RESET ERROR'), err);
     }
-}
-
-// after handler
-async function endQuery() {
-    await pool.end();
 }

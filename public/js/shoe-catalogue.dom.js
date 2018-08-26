@@ -1,34 +1,30 @@
-// Buttons
-var shoeAdd = document.querySelector('.add-shoe');
-var btnBuy = document.querySelector('.buy-btn');
-var btnAddItem = document.querySelector('.add-button');
-var btnAddSection = document.querySelector('.open-add-section');
-var cartBtn = document.querySelector('.cart-btn');
-var cartDisplay = document.querySelector('.cart-container');
-var cartClose = document.querySelector('.cart-close');
-
-// New shoe inputs
-var brandElem = document.querySelector('.shoe-brand');
-var colourElem = document.querySelector('.shoe-colour');
-var sizeElem = document.querySelector('.shoe-size');
-var priceElem = document.querySelector('.shoe-price');
-var qtyElem = document.querySelector('.shoe-qty');
-
+// buttons
+const shoeAdd = document.querySelector('.add-shoe');
+const btnBuy = document.querySelector('.buy-btn');
+const btnAddItem = document.querySelector('.add-button');
+const btnAddSection = document.querySelector('.open-add-section');
+const cartBtn = document.querySelector('.cart-btn');
+const cartDisplay = document.querySelector('.cart-container');
+const cartClose = document.querySelector('.cart-close');
+// new shoe inputs
+const brandElem = document.querySelector('.shoe-brand');
+const colourElem = document.querySelector('.shoe-colour');
+const sizeElem = document.querySelector('.shoe-size');
+const priceElem = document.querySelector('.shoe-price');
+const qtyElem = document.querySelector('.shoe-qty');
 // selects / filter
-var brandSelect = document.querySelector('.brand-select');
-var colourSelect = document.querySelector('.colour-select');
-var sizeSelect = document.querySelector('.size-select');
-
+const brandSelect = document.querySelector('.brand-select');
+const colourSelect = document.querySelector('.colour-select');
+const sizeSelect = document.querySelector('.size-select');
 // template setup
 let shoeTemplate = document.querySelector('.shoes-template').innerHTML;
 let cartTemplate = document.querySelector('.cart-template').innerHTML;
 const SHOE_TEMPLATE = Handlebars.compile(shoeTemplate);
 const CART_TEMPLATE = Handlebars.compile(cartTemplate);
-
-var displayElem = document.querySelector('.list-display');
-var cartWrapper = document.querySelector('.cart-wrapper');
-var addAlert = document.querySelector('.alert');
-
+// display elements
+const displayElem = document.querySelector('.list-display');
+const cartWrapper = document.querySelector('.cart-wrapper');
+const addAlert = document.querySelector('.alert');
 
 // factory function instance
 var shoes = ShoeCatalogue();
@@ -47,9 +43,12 @@ function filterEvent() {
     if (sizeSelect.value !== '') {
         params.size = Number(sizeSelect.value);
     }
-    shoes.map(params)
+
+    shoes.filterBy(params)
         .then(res => {
-            displayElem.innerHTML = SHOE_TEMPLATE({ shoeList: res.items })
+            displayElem.innerHTML = SHOE_TEMPLATE({
+                shoeList: res.data.items
+            })
         });
 }
 
@@ -124,11 +123,12 @@ btnAddItem.addEventListener('click', function () {
         qty: Number(qtyElem.value)
     };
     shoes.new(shoe).then(res => {
+        if (res.data.status === 'success') {
+            refreshShoes();
+            toggleAddNew();
+        }
         toggleAlert(res.data.message);
-        refreshShoes();
-        toggleAddNew();
     })
-
 });
 
 brandSelect.addEventListener('change', filterEvent);

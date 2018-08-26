@@ -1,18 +1,7 @@
 const chalk = require('chalk');
 
-const connection = process.env.DATABASE_URL || {
-    host: '127.0.0.1',
-    user: 'coder',
-    password: 'coder123',
-    database: 'shoe_api'
-}
-const knex = require('knex')({
-    client: 'pg',
-    version: '7.2',
-    connection
-})
 
-module.exports = function(pool) {
+module.exports = function (pool, knex) {
     // SHOE VALIDATION
     // function isShoe(shoe) {
     //     if (Object.values(shoe).includes(undefined) || Object.entries(shoe).length < 5) {
@@ -24,38 +13,44 @@ module.exports = function(pool) {
     async function addShoe(shoe) {
         if (!shoe) {
             console.log(chalk.bgRed.white('no shoe provided'));
-            return 'no shoe provided';
-        }
-
-        var found = await findShoe(shoe);
-        if (found) {
-            console.log(chalk.bgRed.white('shoe already exists'));
-            return 'shoe already exists';
+            return {
+                status: 'error',
+                message: 'no shoe provided'
+            };
         }
 
         try {
+            var found = await findShoe(shoe);
+            if (found) {
+                console.log(chalk.bgRed.white('shoe already exists'));
+                return {
+                    status: 'error',
+                    message: 'shoe already exists'
+                };
+            }
             await pool.query('insert into shoes (brand, colour, size, price, qty) \
                 values ($1, $2, $3, $4, $5)',
                 [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty]
             );
             console.log(chalk.bgGreen.white('shoe added successfully'));
-            return 'shoe added successfully';
+            return { status: 'success', message: 'shoe added successfully' };
         } catch (err) {
             console.log(chalk.bgRed.white(err));
-            return 'could not process the request';
+            return { status: 'error', error: err.stack };
         }
     }
 
     async function updateShoe(shoe) {
         var found = await findShoe(shoe);
-        if (!found) {
-            return {
-                status: 'error',
-                error: 'unknown shoe'
-            };
-        }
 
         try {
+            if (!found) {
+                return {
+                    status: 'error',
+                    error: 'unknown shoe'
+                };
+            }
+
             await pool.query('update shoes set brand=$1, colour=$2, \
                 size=$3, price=$4, qty=$5 where id=$6',
                 [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty, found.id]
@@ -79,12 +74,7 @@ module.exports = function(pool) {
             let results = await knex.select('*')
                 .from('shoes')
                 .where(params);
-            // THEN CLOSE THE COONECTION
-            knex.destroy()
-                .then(() => {
-                    console.log(chalk.bgGreen.white('DB CONNECTION CLOSED SUCCESSFULLY'));
-                });
-            
+
             return {
                 status: 'success',
                 items: results
