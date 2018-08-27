@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 
-const connection = process.env.DATABASE_URL || {
+const connection = process.env.PG_CONNECTION_STRING || {
     host: '127.0.0.1',
     user: 'coder',
     password: 'coder123',
