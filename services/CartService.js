@@ -1,5 +1,3 @@
-const chalk = require('chalk');
-
 module.exports = function (pool){
 
     async function findShoeById(shoe) {
@@ -97,6 +95,7 @@ module.exports = function (pool){
         }
         return cart;
     }
+
     async function clearCart() {
         let found = await pool.query('select * from cart');
 

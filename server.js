@@ -1,18 +1,28 @@
+"use strict";
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const chalk = require('chalk');
 
 const Connection = require('./config/dbconnection');
 const ShoeService = require('./services/ShoeService');
 const CartService = require('./services/CartService');
-const pool = Connection();
-const shoes = ShoeService(pool);
-const cart = CartService(pool);
 
 const app = express();
-const shoeApi = ShoeApi(pool);
 const PORT = process.env.PORT || 3000;
+
+const knex = require('knex')({
+    client: 'pg',
+    version: '7.2',
+    connection: process.env.DATABASE_URL || {
+        host: '127.0.0.1',
+        password: 'nomawonga',
+        database: 'shoe_api'
+    }
+});
+
+const pool = Connection();
+const shoes = ShoeService(pool, knex);
+const cart = CartService(pool);
 
 // middleware
 app.use(express.static('public'));
@@ -24,10 +34,16 @@ app.use(cors());
 app.get('/api/shoes/all', async (req, res, next) => {
     res.json(await shoes.getShoes());
 });
+// gets filtered sheos
+app.post('/api/shoes/filter', async (req, res, next) => {
+    res.json(await shoes.getShoes(req.body));
+});
 
 // adds a shoe
 app.post('/api/shoes/add', async (req, res, next) => {
     let shoe = req.body;
+    console.log('sent shoe:', shoe);
+    
     res.json(await shoes.addShoe(shoe));
 });
 
