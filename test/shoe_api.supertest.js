@@ -1,6 +1,7 @@
 const assert = require('assert');
 const request = require('supertest');
-const base_url = 'http://localhost:3000';
+const base_url = process.env.public_url || 'http://localhost:3000';
+
 
 describe('GET /api/shoes/all', function() {
 
