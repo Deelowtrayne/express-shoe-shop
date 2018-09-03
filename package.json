@@ -4,7 +4,7 @@
   "description": "API setup for shoe-catalogue application",
   "main": "server.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text-lcov mocha",
+    "test": "nyc mocha",
     "start": "node server.js"
   },
   "author": "Luvuyo Sono",
