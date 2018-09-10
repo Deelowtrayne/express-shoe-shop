@@ -58,6 +58,7 @@ module.exports = function (pool, knex) {
             return {
                 status: 'success',
                 message: 'update successful'
+                
             }
         }
         catch (err) {
