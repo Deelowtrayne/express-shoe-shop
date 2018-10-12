@@ -70,24 +70,32 @@ module.exports = function (pool, knex) {
     }
 
     async function getShoes(params) {
-        if (params) {
-            let results = await knex.select('*')
-                .from('shoes')
-                .where(params);
-
-            // let props = Object.entries(params);
-            // let shoePromises = props.map(([field, value]) => {
-            //     return pool.query('select * from shoes where $1=$2', [field, value]);
-            // });
-            // results = await Promise.all(shoePromises);
-
-            return {
-                status: 'success',
-                items: results
-            };
-        }
+        console.log('params:', params);
+        
+       
 
         try {
+
+            if (params && Object.keys(params).length > 0) {
+                console.log('paramsssss', params);
+                
+                let q = 'select * from shoes where ';
+                let props = Object.entries(params);
+                for (let prop of props) {
+                    let [key, value] = prop;
+                    q = props.indexOf(prop) == 0 ? q + `${key}='${value}'` : q + ` and ${key}='${value}'`;
+                }
+                console.log('query', q);
+                
+                let results = await pool.query(q);
+                
+                return {
+                    status: 'success',
+                    items: results.rows
+                };
+            }
+
+            // otherwise bring back everything
             const result = await pool.query('select * from shoes order by brand');
             return {
                 status: 'success',

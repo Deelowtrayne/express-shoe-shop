@@ -37,7 +37,7 @@ function filterEvent() {
     }
 
     if (colourSelect.value !== '') {
-        params.colour = colourSelect.value.toLowerCase();
+        params.colour = colourSelect.value;
     }
 
     if (sizeSelect.value !== '') {
