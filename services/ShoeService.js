@@ -31,7 +31,6 @@ module.exports = function (pool, knex) {
                 values ($1, $2, $3, $4, $5)',
                 [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty]
             );
-            console.log(chalk.bgGreen.white('shoe added successfully'));
             return { status: 'success', message: 'shoe added successfully' };
         } catch (err) {
             console.log(chalk.bgRed.white(err));
@@ -53,8 +52,7 @@ module.exports = function (pool, knex) {
             await pool.query('update shoes set brand=$1, colour=$2, \
                 size=$3, price=$4, qty=$5 where id=$6',
                 [shoe.brand, shoe.colour, shoe.size, shoe.price, shoe.qty, found.id]
-            )
-            console.log(chalk.bgGreen.white('update successful'))
+            );
             return {
                 status: 'success',
                 message: 'update successful'
@@ -70,14 +68,8 @@ module.exports = function (pool, knex) {
     }
 
     async function getShoes(params) {
-        console.log('params:', params);
-        
-       
-
         try {
-
             if (params && Object.keys(params).length > 0) {
-                console.log('paramsssss', params);
                 
                 let q = 'select * from shoes where ';
                 let props = Object.entries(params);
@@ -85,16 +77,12 @@ module.exports = function (pool, knex) {
                     let [key, value] = prop;
                     q = props.indexOf(prop) == 0 ? q + `${key}='${value}'` : q + ` and ${key}='${value}'`;
                 }
-                console.log('query', q);
-                
                 let results = await pool.query(q);
-                
                 return {
                     status: 'success',
                     items: results.rows
                 };
             }
-
             // otherwise bring back everything
             const result = await pool.query('select * from shoes order by brand');
             return {
