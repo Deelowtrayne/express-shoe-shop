@@ -16,7 +16,7 @@
 <body>
     <div class="container">
         <div class="topbar clearfix">
-            <h1>Shoe Catalogue App<br><small>A simple javascript shoe catalogue application</small></h1>
+            <h1>Shoe Catalogue App<br><small>A simple javascript shoe shop application</small></h1>
             <button class="cart-btn" onclick="toggleCart()"><i class="fas fa-shopping-cart"></i></button>
             
         </div>
@@ -56,13 +56,12 @@
                     <div class="shoe clearfix">
                         <table>
                             <tr><td><b>Brand:</b></td> <td>{{brand}}</td></tr>
-                            <tr><td><b>Colour:</b></td> <td>{{colour}}</td></tr>
                             <tr><td><b>Size:</b></td> <td>{{size}}</td></tr>
-                            <tr><td><b>Price:</b></td> <td>{{price}}</td></tr>
                             <tr><td><b>Qty:</b></td> <td>{{qty}}</td></tr>
+                            <tr><td><b>Sub Total:</b></td> <td>R{{subtotal}}</td></tr>
                         </table>
                         <!-- // Buy button -->
-                        <aside class="item-image"></aside>
+                        <!-- <aside class="item-image"></aside> -->
                     </div>
                     {{/each}}
                     <div class="cart-total">
@@ -115,8 +114,8 @@
                             <tr><td><b>Brand:</b></td> <td>{{brand}}</td></tr>
                             <tr><td><b>Colour:</b></td> <td>{{colour}}</td></tr>
                             <tr><td><b>Size:</b></td> <td>{{size}}</td></tr>
-                            <tr><td><b>Price:</b></td> <td>{{price}}</td></tr>
                             <tr><td><b>Qty:</b></td> <td>{{qty}}</td></tr>
+                            <tr><td><b>Price:</b></td> <td>R{{price}}</td></tr>
                         </table>
                         <button class="buy-btn" id="{{id}}" onclick="searchString(this)"><i class="fas fa-shopping-bag"></i></button>
                         <!-- // Buy button -->

@@ -15,7 +15,7 @@ const knex = require('knex')({
     version: '7.2',
     connection: process.env.DATABASE_URL || {
         host: '127.0.0.1',
-        password: 'coder123',
+        password: 'nomawonga',
         database: 'shoe_api'
     }
 });
